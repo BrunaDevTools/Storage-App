@@ -1,0 +1,20 @@
+# Dependencias
+node_modules/
+
+# Variables de entorno
+.env
+.env.local
+
+# Firebase
+.firebase/
+
+# Builds
+dist/
+out/
+
+# Editor
+.vscode/
+.idea/
+
+# Sistema operativo
+.DS_Store
