@@ -3,6 +3,7 @@ import { db } from "../../services/firebase";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { useNavigate } from "react-router-dom";
 import { auth } from "../../services/firebase";
+import useUbicaciones from "../../hooks/useUbicaciones";
 
 export default function SaveItem() {
   const [nombre, setNombre] = useState("");
@@ -10,6 +11,18 @@ export default function SaveItem() {
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const [categoria, setCategoria] = useState("general");
+  const categorias = [
+    "Ropa",
+    "Herramientas",
+    "Documentos",
+    "Electrónica",
+    "Libros",
+    "Juguetes",
+    "Adornos",
+    "General",
+  ];
+  const ubicaciones = useUbicaciones(); // Hook para obtener ubicaciones
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,7 +41,9 @@ export default function SaveItem() {
         ubicacion: ubicacion.trim(),
         createdAt: serverTimestamp(), // Fecha automatica de creación
         userId: auth.currentUser.uid, // Asocia el objeto al usuario actual
+        categoria: categoria,
       });
+
       navigate("/todos"); // Redirigir a la página de todos los objetos
     } catch (err) {
       setError("Error al guardar: " + err.message);
@@ -63,16 +78,40 @@ export default function SaveItem() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
+            Categoría
+          </label>
+          <select
+            value={categoria}
+            onChange={(e) => setCategoria(e.target.value)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            disabled={loading}
+          >
+            {categorias.map((cat) => (
+              <option key={cat.toLowerCase()} value={cat.toLowerCase()}>
+                {cat}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
             Ubicación
           </label>
           <input
             type="text"
             value={ubicacion}
             onChange={(e) => setUbicacion(e.target.value)}
+            list="ubicaciones-list"
             className="w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             placeholder="Ej: Armario del pasillo, en caja blanca"
             disabled={loading}
           />
+          <datalist id="ubicaciones-list">
+            {ubicaciones.map((ubicacion, index) => (
+              <option key={index} value={ubicacion} />
+            ))}
+          </datalist>
         </div>
 
         <button
